@@ -13,6 +13,8 @@ namespace Lab7CSharp
 {
     public partial class Form1 : Form
     {
+        private Timer timer = new Timer();
+        private float animationTime = 0f; // Час анімації
         public Form1()
         {
             InitializeComponent();
@@ -21,6 +23,12 @@ namespace Lab7CSharp
             comboBox1.Items.Add("Точка");
             comboBox1.Items.Add("Коло");
             comboBox1.Items.Add("Квадрат");
+            // Task1
+
+            // Task2
+            timer.Interval = 100; // Інтервал таймера в мілісекундах
+            timer.Tick += Timer_Tick; // Підписка на подію Tick таймера
+            // Task2
 
             // Task3
             comboBox2.Items.Add("Прямокутник із заокругленими кутами");
@@ -33,6 +41,7 @@ namespace Lab7CSharp
             comboBox3.Items.Add("Синій");
             comboBox3.Items.Add("Жовтий");
             comboBox3.Items.Add("Зелений");
+            // Task3
         }
 
         // Task1
@@ -42,7 +51,7 @@ namespace Lab7CSharp
             Graphics graphics = Graphics.FromImage(bitmap);
             Random random = new Random();
             string selectedFigure = comboBox1.SelectedItem.ToString();
-            string selectedSize = textBox1.Text;
+            string selectedSize = textBox1.Text; // or random.Next(80 + 20);
 
             Pen pen = new Pen(Color.Black);
             SolidBrush solidBrush = new SolidBrush(Color.FromArgb(random.Next(256), random.Next(256), random.Next(256)));
@@ -76,7 +85,9 @@ namespace Lab7CSharp
             pictureBox1.Image = bitmap;
         }
 
+        // Task1
         // Task2
+
         private void button2_Click(object sender, EventArgs e)
         {
             // Показываем диалог выбора шрифта и цвета
@@ -93,36 +104,59 @@ namespace Lab7CSharp
                 textBox2.ForeColor = fontDialog1.Color;
                 textBox2.Text = "y=sin(x)/x(0<x<4)";
 
-                // Получаем объект Graphics для рисования на PictureBox
-                Graphics g = pictureBox1.CreateGraphics();
-
-                // Определяем ширину и высоту PictureBox
-                int width = pictureBox1.Width;
-                int height = pictureBox1.Height;
-
-                // Определяем масштаб по X и Y
-                float scaleX = width / 4f; // Для x от 0 до 4
-                float scaleY = height / 2f; // Для y от -2 до 2
-
-                // Создаем объект Pen для рисования графика с выбранным цветом и шрифтом
-                Pen pen = new Pen(fontDialog1.Color, 1);
-
-                // Рисуем график функции y=sin(x)/x
-                for (float x = 0.01f; x < 4f; x += 0.01f)
-                {
-                    float y = (float)(Math.Sin(x) / x); // Вычисляем значение функции
-                                                        // Переводим координаты в пиксели и рисуем точку
-                    float pixelX = x * scaleX;
-                    float pixelY = height / 2 - y * scaleY;
-                    g.DrawRectangle(pen, pixelX, pixelY, 1, 1);
-                }
-
-                // Освобождаем ресурсы объекта Graphics
-                g.Dispose();
+                // Запускаємо таймер для анімації
+                animationTime = 0f;
+                timer.Start();
             }
         }
 
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            int secondsToAnimate = int.Parse(textBox8.Text); // Змінна для зберігання кількості секунд для анімації
+            // Останавливаем таймер, якщо час анімації завершено
+            if (animationTime >= secondsToAnimate)
+            {
+                timer.Stop();
+                return;
+            }
+
+            // Очищаємо PictureBox перед початком малювання нового кадру
+            pictureBox1.Refresh();
+
+            // Получаем объект Graphics для рисования на PictureBox
+            Graphics g = pictureBox1.CreateGraphics();
+
+            // Определяем ширину и высоту PictureBox
+            int width = pictureBox1.Width;
+            int height = pictureBox1.Height;
+
+            // Определяем масштаб по X и Y
+            float scaleX = width / 4f; // Для x от 0 до 4
+            float scaleY = height / 2f; // Для y от -2 до 2
+
+            // Создаем объект Pen для рисования графика с выбранным цветом и шрифтом
+            Pen pen = new Pen(fontDialog1.Color, 1);
+
+            // Рисуем график функции y=sin(x)/x для поточного часу анімації
+            for (float x = 0.01f; x < 4f; x += 0.01f)
+            {
+                float y = (float)(Math.Sin(x) / x) * (animationTime / secondsToAnimate); // Використовуйте час анімації для зміни висоти графіка
+                                                                                         // Переводим координаты в пиксели и рисуем точку
+                float pixelX = x * scaleX;
+                float pixelY = height / 2 - y * scaleY;
+                g.DrawRectangle(pen, pixelX, pixelY, 1, 1);
+            }
+
+            // Збільшуємо час анімації на інтервал таймера
+            animationTime += timer.Interval / 1000f;
+
+            // Освобождаем ресурсы объекта Graphics
+            g.Dispose();
+        }
+
+        // Task2
         // Task3
+
         class Figure
         {
             protected string type;
@@ -320,5 +354,7 @@ namespace Lab7CSharp
             pictureBox2.Image = bitmap;
             pictureBox2.Refresh();
         }
+
+        // Task3
     }
 }
